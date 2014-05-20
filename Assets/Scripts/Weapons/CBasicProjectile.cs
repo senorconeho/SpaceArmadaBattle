@@ -18,6 +18,7 @@ public class CBasicProjectile : MonoBehaviour {
 	public bool				bnEnableCollision	=	false;	//< Should we do a collision check for this projectile?
 	public bool				bnRecycleGameObject = false;	//< Should we use the object cache
 	public Transform	trShooter;									//< Who shot this?
+	public float			fStartSpeed = 0.0f;
 
 	// PRIVATE
 	private float			fSpawnTime = 0.0f;	//< internal TTL timer
@@ -67,7 +68,7 @@ public class CBasicProjectile : MonoBehaviour {
 	protected virtual void DoMovement() {
 
 		// Travels forward
-		tr.position += tr.up * fSpeed * Time.deltaTime;
+		tr.position += tr.up * (fSpeed + fStartSpeed) * Time.deltaTime;
 		fDistance -= fSpeed * Time.deltaTime;
 
 	}

@@ -13,6 +13,7 @@ public class InputPilotingFighter : MonoBehaviour {
 	// PUBLIC
 	public Vector2 vMoveDirection = Vector2.zero;
 	public Vector2 vVelocity;
+	public float	fMaxSpeed = 10.0f;
 
 	// PRIVATE
 	Rigidbody2D rb;
@@ -74,6 +75,10 @@ public class InputPilotingFighter : MonoBehaviour {
 	// Physics
 	void FixedUpdate() {
 
+		if(rb.velocity.magnitude > fMaxSpeed) {
+
+			rb.velocity = rb.velocity.normalized * fMaxSpeed;
+		}
 	}
 
 	/* ==========================================================================================================

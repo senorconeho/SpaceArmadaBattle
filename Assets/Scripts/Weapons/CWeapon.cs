@@ -17,8 +17,8 @@ public class CWeapon : MonoBehaviour {
 	public GameObject		bulletPrefab			=	null;	//< Bullet to be instantiated when the weapon fires
 	public GameObject		particlePrefab		= null;	//< Particle shown when the weapon shoot
 	public Transform		trSpawnPoint			= null;	//< Where the bullet will be instantiated
-	public float				fFrequency				= 10;		//< shots per second
-	public float				fDamagePerSecond	= 20;		//< Damage inflicted per second. FIXME: this should be in the projectile class		
+	public float				fShotsPerSecond				= 10;		//< shots per second
+	public float				fDamagePerShot	= 20;		//< Damage inflicted per second. FIXME: this should be in the projectile class		
 	public Transform		trShooter					= null;	//< Who is shooting with this weapon
 	public CBaseActor		actorShooterScript = null;
 
@@ -47,7 +47,7 @@ public class CWeapon : MonoBehaviour {
 	/// <summary>
 	/// Shoots the projectile
 	/// </summary>
-	public void Shoot() {
+	public void Shoot(float fStartSpeed) {
 
 		if(bnIsFiring)
 			return;
@@ -60,10 +60,21 @@ public class CWeapon : MonoBehaviour {
 		GameObject go = Instantiate(bulletPrefab, trSpawnPoint.position, trSpawnPoint.rotation) as GameObject;
 		CBasicProjectile bulletScript = go.GetComponent<CBasicProjectile>();
 
+		// Sets the start velocity
+		if(trShooter != null) {
+
+			bulletScript.fStartSpeed = fStartSpeed;
+		}
+
 		fLastFireTime = Time.time;
 
 		bulletScript.fDistance = 1000;
 		bulletScript.trShooter = trShooter;
+	}
+
+	public void Shoot() {
+
+		Shoot(0.0f);
 	}
 	
 	// Update is called once per frame
@@ -71,7 +82,7 @@ public class CWeapon : MonoBehaviour {
 
 		if(bnIsFiring) {
 
-			if(Time.time > fLastFireTime + ( 1/fFrequency )) {
+			if(Time.time > fLastFireTime + ( 1/fShotsPerSecond)) {
 
 				bnIsFiring = false;
 			}
