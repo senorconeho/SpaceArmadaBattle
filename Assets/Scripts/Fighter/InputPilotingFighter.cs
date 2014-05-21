@@ -23,6 +23,7 @@ public class InputPilotingFighter : MonoBehaviour {
 	public Vector3 vCursorPosition = Vector3.zero;
 
 	public MovementCursor	cursorScript = null;	//< script with the mouse position and direction to it
+	public ShipLookAt	shipRotationScript = null;
 
 	// PROTECTED
 
@@ -41,6 +42,7 @@ public class InputPilotingFighter : MonoBehaviour {
 	void Start () {
 	
 		cursorScript = GetComponent<MovementCursor>();
+		shipRotationScript = GetComponent<ShipLookAt>();
 	}
 	
 	// Update is called once per frame
@@ -53,7 +55,10 @@ public class InputPilotingFighter : MonoBehaviour {
 			// The direction is only used when the thrust is applied
 			if(cursorScript) {
 
-				vMoveDirection = cursorScript.vCursorDirection;
+				//vMoveDirection = cursorScript.vCursorDirection;
+				
+				// Using the direction where the front of the ship is pointing
+				vMoveDirection = shipRotationScript.mesh.TransformDirection(Vector2.up);
 			}
 
 		}
@@ -66,8 +71,7 @@ public class InputPilotingFighter : MonoBehaviour {
 		else if(fInputThrust > 1.0f)
 			fInputThrust = 1.0f;
 
-		//rb.AddForce(fInputThrust * fJetThrust * vMoveDirection);
-		//rb.AddTorque(vMoveDirection.y * 20.0f);
+		// FIXME: must not use vMoveDirection here, instead must use the 'forward' vector from the ship mesh
 		rb.AddForce(fInputThrust * fJetThrust * vMoveDirection);
 		vVelocity = rb.velocity;
 	}

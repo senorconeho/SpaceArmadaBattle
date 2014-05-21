@@ -108,6 +108,19 @@ public class SteeringBehaviors : MonoBehaviour {
 	/// </summary>
 	void Flee() {
 
+		if(target == null)
+			return;
+
+		Vector3 direction = transform.position - target.position;
+		direction.z = 0;
+
+		if(direction.magnitude < safeDistance) {
+
+			// FIXME
+			transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), rotationSpeed * Time.deltaTime);
+			Vector3 moveVector = direction.normalized * moveSpeed * Time.deltaTime;
+			transform.position += moveVector;
+		}
 	}
 
 	/// <summary>
