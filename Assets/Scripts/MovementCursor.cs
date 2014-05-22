@@ -8,13 +8,12 @@ public class MovementCursor : MonoBehaviour {
 	
 	// PUBLIC
 	public Texture2D		txCursor;
-	public Vector3			vCursorNow;
-	public Vector3			vCursorDirection;
-	public Vector3			vCursor2Ship;
-	public Vector3			vCursorDirectionOnScreen;
+	Vector3			vCursorNow;
+	Vector3			vCursorDirection;
+	Vector3			vCursor2Ship;
+	Vector3			vCursorDirectionOnScreen;
 	public bool					bnUseGamepad = false;
-	public float				fShowCursorRadius = 4.0f;
-	public float			fMaxSpeed;
+	public float				fMaxSpeed;
 
 	public Transform		trCursorObject;
 	SteeringBehaviors		steeringBehaviorsScript = null;
@@ -80,9 +79,7 @@ public class MovementCursor : MonoBehaviour {
 	/// </summary>
 	void OnGUI() {
 
-		// If the mouse cursor is outside our 'fShowCursorRadius', then the cursor is shown around the ship.
-		// With the cursor on the screen, the ship should move towards it
-		if(txCursor != null && vCursor2Ship.sqrMagnitude > fShowCursorRadius) {
+		if(txCursor != null) {
 
 			vCursorDirectionOnScreen = Camera.main.WorldToScreenPoint(transform.position + vCursorDirection);
 			//GUI.DrawTexture(new Rect(vCursorNow.x, Screen.height - vCursorNow.y, 32, 32), txCursor);

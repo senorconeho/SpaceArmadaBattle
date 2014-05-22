@@ -16,10 +16,13 @@ public class SteeringBehaviors : MonoBehaviour {
 	 * -----------------------------------------------------------------------------------------------------------
 	 */
 
-	public Transform		target;
-	public float			moveSpeed = 6.0f;
+	public Transform	target;
 	public float			rotationSpeed = 30.0f;
-	public Vector3 			moveVector;
+
+	[HideInInspector]
+	public float			moveSpeed;
+	[HideInInspector]
+	public Vector3 		moveVector;
 
 	private int			minDistance = 1;
 	private int			safeDistance = 60;

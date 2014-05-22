@@ -17,9 +17,15 @@ public class CWeapon : MonoBehaviour {
 	public GameObject		bulletPrefab			=	null;	//< Bullet to be instantiated when the weapon fires
 	public GameObject		particlePrefab		= null;	//< Particle shown when the weapon shoot
 	public Transform		trSpawnPoint			= null;	//< Where the bullet will be instantiated
-	public float				fShotsPerSecond				= 10;		//< shots per second
-	public float				fDamagePerShot	= 20;		//< Damage inflicted per second. FIXME: this should be in the projectile class		
+	public float				fShotsPerSecond		= 10;		//< shots per second
+	public bool					bnAllowSpread = false;		//< Should we allo w the bullet spread
+	float								fSpreadAngle = 3.0f;			//< Angle of random spread of the bullets
+	Quaternion					qSpreadRotation;					//< Calculated spread rotation of the bullet
+
+	// FIXME: create methods to get these values and turn them private
+	[HideInInspector]
 	public Transform		trShooter					= null;	//< Who is shooting with this weapon
+	[HideInInspector]
 	public CBaseActor		actorShooterScript = null;
 
 	// PRIVATE
@@ -57,7 +63,15 @@ public class CWeapon : MonoBehaviour {
 		// Spawn a bullet
 		// Using the spawner
 		//GameObject go = Spawner.Spawn(bulletPrefab, trSpawnPoint.position, trSpawnPoint.rotation) as GameObject;
-		GameObject go = Instantiate(bulletPrefab, trSpawnPoint.position, trSpawnPoint.rotation) as GameObject;
+		if(bnAllowSpread) {
+				
+			qSpreadRotation = Quaternion.Euler(0, 0, Random.Range(-fSpreadAngle, fSpreadAngle));
+		}
+		else {
+
+			qSpreadRotation = Quaternion.identity;
+		}
+		GameObject go = Instantiate(bulletPrefab, trSpawnPoint.position, trSpawnPoint.rotation * qSpreadRotation) as GameObject;
 		CBasicProjectile bulletScript = go.GetComponent<CBasicProjectile>();
 
 		// Sets the start velocity

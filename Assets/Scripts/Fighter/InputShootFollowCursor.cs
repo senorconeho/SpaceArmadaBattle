@@ -3,8 +3,8 @@ using System.Collections;
 
 public class InputShootFollowCursor : MonoBehaviour {
 
-	public CWeapon	weaponScript = null;
-	public SteeringBehaviors steeringScript;
+	CWeapon	weaponScript = null;
+	SteeringBehaviors steeringScript;
 
 	// Use this for initialization
 	void Start () {
