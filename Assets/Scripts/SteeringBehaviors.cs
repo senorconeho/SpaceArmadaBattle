@@ -16,10 +16,11 @@ public class SteeringBehaviors : MonoBehaviour {
 	 * -----------------------------------------------------------------------------------------------------------
 	 */
 
-	public Transform	target;
+	public Transform		target;
 	public float			moveSpeed = 6.0f;
 	public float			rotationSpeed = 30.0f;
-	
+	public Vector3 			moveVector;
+
 	private int			minDistance = 1;
 	private int			safeDistance = 60;
 
@@ -38,6 +39,7 @@ public class SteeringBehaviors : MonoBehaviour {
 	/// Start will execute when an object with it is instantiated
 	/// </summary>
 	void Start () {
+
 	
 	}
 	
@@ -98,7 +100,7 @@ public class SteeringBehaviors : MonoBehaviour {
 
 		if(direction.magnitude > minDistance){
 
-			Vector3 moveVector = transform.up * moveSpeed * Time.deltaTime;	// Trying to make the ship move forward
+			moveVector = transform.up * moveSpeed * Time.deltaTime;	// Trying to make the ship move forward
 			transform.position += moveVector;
 		}
 	}

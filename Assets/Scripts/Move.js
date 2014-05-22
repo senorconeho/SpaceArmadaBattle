@@ -6,7 +6,7 @@ public var moveSpeed : int = 10;
 
  
 
-var instantVelocity : Vector3;
+public var instantVelocity : Vector3;
 
  
 
@@ -47,6 +47,11 @@ function Update () {
     
 
     instantVelocity = transform.position - pos;
+    
 
+}
+
+public function GetInstantVelocity(){
+	return instantVelocity;
 }
 

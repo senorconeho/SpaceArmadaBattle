@@ -14,6 +14,7 @@ public class MovementCursor : MonoBehaviour {
 	public Vector3			vCursorDirectionOnScreen;
 	public bool					bnUseGamepad = false;
 	public float				fShowCursorRadius = 4.0f;
+	public float			fMaxSpeed;
 
 	public Transform		trCursorObject;
 	SteeringBehaviors		steeringBehaviorsScript = null;
@@ -35,6 +36,7 @@ public class MovementCursor : MonoBehaviour {
 	void Start () {
 	
 		steeringBehaviorsScript = GetComponent<SteeringBehaviors>();
+		steeringBehaviorsScript.target = trCursorObject;
 	}
 	
 	/// <summary>
@@ -54,17 +56,12 @@ public class MovementCursor : MonoBehaviour {
 
 			if(trCursorObject != null)
 				trCursorObject.position = transform.position + vCursorDirection;
+			// Alterar o move Speed do SteeringBehaviors aqui!
+			steeringBehaviorsScript.moveSpeed = vCursor2Ship.magnitude;
 
-			// Should we move?
-			if(vCursor2Ship.sqrMagnitude > fShowCursorRadius) {
+			if(steeringBehaviorsScript.moveSpeed > fMaxSpeed)
+				steeringBehaviorsScript.moveSpeed = fMaxSpeed;
 
-				if(steeringBehaviorsScript != null && trCursorObject != null)
-					steeringBehaviorsScript.target = trCursorObject;
-			}
-			else {
-				if(steeringBehaviorsScript != null)
-					steeringBehaviorsScript.target = null;
-			}
 		}
 		else {
 
