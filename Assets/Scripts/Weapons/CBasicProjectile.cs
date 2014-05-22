@@ -14,11 +14,12 @@ public class CBasicProjectile : MonoBehaviour {
 	public float			fSpeed						= 4.2f;		//< Travel speed
 	public float			fLifeTime					= 2.0f;		//< How long it lasts
 	public float			fDamageDone				= 0.25f;	//< Damage done when hit something
-	public float			fDistance					= 100;		//< Distance to the target
 	public bool				bnEnableCollision	=	false;	//< Should we do a collision check for this projectile?
 	public bool				bnRecycleGameObject = false;	//< Should we use the object cache
 	public Transform	trShooter;									//< Who shot this?
+	[HideInInspector]
 	public float			fStartSpeed = 0.0f;
+	public float			fDistance					= 100;		//< Distance to the target
 
 	// PRIVATE
 	private float			fSpawnTime = 0.0f;	//< internal TTL timer
