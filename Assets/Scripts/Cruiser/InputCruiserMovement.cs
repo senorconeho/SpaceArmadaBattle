@@ -12,9 +12,21 @@ public class InputCruiserMovement : MonoBehaviour {
 	 */
 
 	public Texture2D	txCursorSelectPosition;		//< Cursor to select the ship's position
+	public Vector3		vGUICursorPosition;
+	public Transform	prefabOrientationObject = null;
+	public float			fMoveSpeed = 1.5f;
+	public float			fRotationSpeed = 0.05f;
+
+	Vector3		vMoveDirection;
+
 	Texture2D txCurrentCursor = null;
-	public Vector3							vGUICursorPosition;
-	public string	stMenuMessage = null;
+	Transform trOrientationObject = null;
+	string	stMenuMessage = null;
+
+	Vector3				vMovementTargetPosition;		//< Selected position to move the ship to
+	Quaternion		qMovementTargetRotation;		//< Selected orientation of the ship
+
+	LineRenderer	lineToTargetPosition = null;	//< To draw a line
 
 	int nMenuLevel = 0;
 	InputGenericMouseCursorPosition	mouseScript;
@@ -32,6 +44,15 @@ public class InputCruiserMovement : MonoBehaviour {
 	void Start () {
 	
 		mouseScript = GetComponent<InputGenericMouseCursorPosition>();
+		lineToTargetPosition = GetComponent<LineRenderer>();
+		lineToTargetPosition.SetWidth(0.2f,0.1f);
+		lineToTargetPosition.SetColors(Color.red, Color.red);
+
+		if(prefabOrientationObject != null) {
+
+			trOrientationObject = Instantiate(prefabOrientationObject) as Transform;
+			trOrientationObject.gameObject.SetActive(false);
+		}
 	}
 	
 	/// <summary>
@@ -46,8 +67,12 @@ public class InputCruiserMovement : MonoBehaviour {
 			nMenuLevel = 1;
 		}
 
-		if(Input.GetMouseButton(0) && nMenuLevel == 1) {
+		if(Input.GetMouseButtonUp(0)) {
+
 			// Confirming the move position
+			if(nMenuLevel == 1) {
+				vMovementTargetPosition =  mouseScript.GetCurrentCursorPosition();
+			} 
 			nMenuLevel++;
 		}
 
@@ -80,13 +105,54 @@ public class InputCruiserMovement : MonoBehaviour {
 			// DEBUG
 			txCurrentCursor = txCursorSelectPosition;
 			stMenuMessage = "[MOVE] Select target position";
+
+			// Draws the LineRenderer
+			lineToTargetPosition.SetPosition(0, this.transform.position + new Vector3(0,0,-2));
+			lineToTargetPosition.SetPosition(1, mouseScript.GetCurrentCursorPosition() + new Vector3(0,0,-2));
+
 		}
 		// The player confirmed the target position. Now he must select the ship orientation
 		if(nCurrentMenuLevel == 2) {
 			
 			// DEBUG
-			txCurrentCursor = txCursorSelectPosition;
+			txCurrentCursor = null;
 			stMenuMessage = "[MOVE] Select ship orientation";
+			if(trOrientationObject != null ) {
+				if(trOrientationObject.gameObject.activeInHierarchy == false) {
+					// Place the cursor on the selected place and activate it
+					trOrientationObject.transform.position = vMovementTargetPosition;
+					trOrientationObject.gameObject.SetActive(true);
+				}
+				else {
+
+					// Rotate the cursor to aim to the mouse cursor
+					Vector3 direction = mouseScript.GetCurrentCursorPosition() - trOrientationObject.position;
+					direction.z = 0;
+
+					float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+					// Adjust the angle in the trinometric circle (where up is 90 degrees, right 0 degrees and left 180 degrees)
+					angle = 90 - angle;
+					Quaternion lookAtRotation = Quaternion.AngleAxis(angle, -trOrientationObject.transform.forward);
+					trOrientationObject.transform.rotation = lookAtRotation;
+				}
+			}
+		}
+
+		// The player confirmed the orientation, so we have to actually move the ship
+		if(nCurrentMenuLevel == 3) {
+
+			if(trOrientationObject.gameObject.activeInHierarchy == true) {
+
+				qMovementTargetRotation = trOrientationObject.transform.rotation;
+				vMoveDirection = trOrientationObject.transform.position - transform.position;
+				trOrientationObject.gameObject.SetActive(false);
+			}
+
+			transform.position += vMoveDirection.normalized * Time.deltaTime;
+			transform.rotation = Quaternion.Lerp(transform.rotation, qMovementTargetRotation, fRotationSpeed);
+
+
 		}
 	}
 
@@ -104,7 +170,7 @@ public class InputCruiserMovement : MonoBehaviour {
 		// Shows a text message on the screen with the current movement status
 		if(stMenuMessage != null) {
 
-			GUI.Label(new Rect(100, Screen.height - 200, 200, 100), stMenuMessage);
+			GUI.Label(new Rect(100, Screen.height - 40, 200, 60), stMenuMessage);
 		}
 	}
 }
