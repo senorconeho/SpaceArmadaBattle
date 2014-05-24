@@ -23,14 +23,20 @@ public class InputCruiserMovement : MonoBehaviour {
 	Transform trOrientationObject = null;
 	string	stMenuMessage = null;
 
-	Vector3				vMovementTargetPosition;		//< Selected position to move the ship to
+	public Vector3				vMovementTargetPosition;		//< Selected position to move the ship to
 	Quaternion		qMovementTargetRotation;		//< Selected orientation of the ship
 
 	LineRenderer	lineToTargetPosition = null;	//< To draw a line
 
 	int nMenuLevel = 0;
 	InputGenericMouseCursorPosition	mouseScript;
-
+	public float fAngle;
+	public float fTimeToComplete;
+	public float fDonePercentage;
+/* -----------------------------------------------------------------------------------------------------------
+	 * 
+	 * -----------------------------------------------------------------------------------------------------------
+	 */
 	/// <summary>
 	/// Will execute when loaded
 	/// </summary>
@@ -149,10 +155,22 @@ public class InputCruiserMovement : MonoBehaviour {
 				trOrientationObject.gameObject.SetActive(false);
 			}
 
-			transform.position += vMoveDirection.normalized * Time.deltaTime;
-			transform.rotation = Quaternion.Lerp(transform.rotation, qMovementTargetRotation, fRotationSpeed);
+			// 
+			fAngle = Quaternion.Angle(transform.rotation, qMovementTargetRotation);
+			fTimeToComplete = fAngle / fRotationSpeed;
+			fDonePercentage = Mathf.Min(1f, Time.deltaTime / fTimeToComplete);
 
+			transform.rotation = Quaternion.Lerp(transform.rotation, qMovementTargetRotation, fDonePercentage);
 
+			if( (Mathf.Abs(transform.position.x - vMovementTargetPosition.x) > 0.01f) 
+					|| (Mathf.Abs(transform.position.y - vMovementTargetPosition.y) > 0.01f)) {
+
+				transform.position += vMoveDirection.normalized * Time.deltaTime * fMoveSpeed;
+			}
+			else {
+
+				// Arrived on target position
+			}
 		}
 	}
 
