@@ -28,7 +28,7 @@ public class InputCruiserMovement : MonoBehaviour {
 
 	LineRenderer	lineToTargetPosition = null;	//< To draw a line
 
-	int nMenuLevel = 0;
+	public int nMenuLevel = 0;
 	InputGenericMouseCursorPosition	mouseScript;
 	public float fAngle;
 	public float fTimeToComplete;
@@ -59,6 +59,8 @@ public class InputCruiserMovement : MonoBehaviour {
 			trOrientationObject = Instantiate(prefabOrientationObject) as Transform;
 			trOrientationObject.gameObject.SetActive(false);
 		}
+
+		EnterMenuLevel(0);
 	}
 	
 	/// <summary>
@@ -71,23 +73,29 @@ public class InputCruiserMovement : MonoBehaviour {
 
 			// Movement Menu
 			nMenuLevel = 1;
+			EnterMenuLevel(nMenuLevel);
 		}
 
-		if(Input.GetMouseButtonUp(0)) {
+		if(Input.GetMouseButtonUp(0) && nMenuLevel != 0) {
 
 			// Confirming the move position
 			if(nMenuLevel == 1) {
 				vMovementTargetPosition =  mouseScript.GetCurrentCursorPosition();
 			} 
+			ExitMenuLevel(nMenuLevel);
+
 			nMenuLevel++;
+			EnterMenuLevel(nMenuLevel);
 		}
 
-		if(Input.GetKey(KeyCode.Escape)) {
+		if(Input.GetKeyUp(KeyCode.Escape)) {
 
+			ExitMenuLevel(nMenuLevel);
 			// Return to a previous state
 			nMenuLevel -=1;
 			if(nMenuLevel < 0)
 				nMenuLevel = 0;
+			EnterMenuLevel(nMenuLevel);
 		}
 
 		ProcessMovementMenuLevel(nMenuLevel);
@@ -97,21 +105,86 @@ public class InputCruiserMovement : MonoBehaviour {
 	 * MY STUFF HERE
 	 * -----------------------------------------------------------------------------------------------------------
 	 */
-	void ProcessMovementMenuLevel(int nCurrentMenuLevel) {
+
+	/// <summary>
+	/// Do whatever we must do when the player cancel an action and returns to the previous level from the 
+	/// menu
+	/// </summary>
+	void EnterMenuLevel(int nCurrentMenuLevel) {
 
 		if(nCurrentMenuLevel == 0) {
 			
 			// DEBUG
 			txCurrentCursor = null;
 			stMenuMessage = null;
+
+			ExitMenuLevel(3);
+			ExitMenuLevel(2);
+			ExitMenuLevel(1);
+			nMenuLevel = 0;
 		}
+
+		if(nCurrentMenuLevel == 1) {
+
+			txCurrentCursor = txCursorSelectPosition;
+			stMenuMessage = "[MOVE] Select target position";
+		}
+
+		if(nCurrentMenuLevel == 2) {
+			// DEBUG
+			trOrientationObject.gameObject.SetActive(true);
+			stMenuMessage = "[MOVE] Select orientation";
+			// Place the cursor on the selected place and activate it
+			trOrientationObject.transform.position = vMovementTargetPosition;
+
+			// Draws the LineRenderer
+			lineToTargetPosition.SetPosition(0, transform.position + new Vector3(0,0,-2));
+			lineToTargetPosition.SetPosition(1, trOrientationObject.position);
+		}
+
+		if(nCurrentMenuLevel == 3) {
+
+			stMenuMessage = "[MOVE] Moving...";
+			trOrientationObject.gameObject.SetActive(true);
+			qMovementTargetRotation = trOrientationObject.transform.rotation;
+			vMoveDirection = trOrientationObject.transform.position - transform.position;
+		}
+	}
+
+	/// <summary>
+	/// Do whatever we must do when the player cancel an action and returns to the previous level from the 
+	/// menu
+	/// </summary>
+	void ExitMenuLevel(int nCurrentMenuLevel) {
+
+		if(nCurrentMenuLevel == 1) {	// Selecting target position
+
+			// Hides the line renderer
+			lineToTargetPosition.SetPosition(0, transform.position);
+			lineToTargetPosition.SetPosition(1, transform.position);
+			txCurrentCursor = null;
+		}
+		
+		if(nCurrentMenuLevel == 2) {	// selecting target orientation
+			// hides the orientation cursor
+			trOrientationObject.gameObject.SetActive(false);
+		}
+
+		if(nCurrentMenuLevel == 3) {	// ship moving towards target
+
+			// Resets the target position and orientation
+			trOrientationObject.gameObject.SetActive(false);
+		}
+	}
+
+	/// <summary>
+	///
+	/// </summary>
+	void ProcessMovementMenuLevel(int nCurrentMenuLevel) {
+
 		// First menu level: the player pressed 'm' to start movement;
 		if(nCurrentMenuLevel == 1) {
 			
-			// DEBUG
-			txCurrentCursor = txCursorSelectPosition;
-			stMenuMessage = "[MOVE] Select target position";
-
 			// Draws the LineRenderer
 			lineToTargetPosition.SetPosition(0, this.transform.position + new Vector3(0,0,-2));
 			lineToTargetPosition.SetPosition(1, mouseScript.GetCurrentCursorPosition() + new Vector3(0,0,-2));
@@ -119,43 +192,22 @@ public class InputCruiserMovement : MonoBehaviour {
 		}
 		// The player confirmed the target position. Now he must select the ship orientation
 		if(nCurrentMenuLevel == 2) {
-			
-			// DEBUG
-			txCurrentCursor = null;
-			stMenuMessage = "[MOVE] Select ship orientation";
-			if(trOrientationObject != null ) {
-				if(trOrientationObject.gameObject.activeInHierarchy == false) {
-					// Place the cursor on the selected place and activate it
-					trOrientationObject.transform.position = vMovementTargetPosition;
-					trOrientationObject.gameObject.SetActive(true);
-				}
-				else {
 
-					// Rotate the cursor to aim to the mouse cursor
-					Vector3 direction = mouseScript.GetCurrentCursorPosition() - trOrientationObject.position;
-					direction.z = 0;
+			// Rotate the cursor to aim to the mouse cursor
+			Vector3 direction = mouseScript.GetCurrentCursorPosition() - trOrientationObject.position;
+			direction.z = 0;
 
-					float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+			float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-					// Adjust the angle in the trinometric circle (where up is 90 degrees, right 0 degrees and left 180 degrees)
-					angle = 90 - angle;
-					Quaternion lookAtRotation = Quaternion.AngleAxis(angle, -trOrientationObject.transform.forward);
-					trOrientationObject.transform.rotation = lookAtRotation;
-				}
-			}
+			// Adjust the angle in the trinometric circle (where up is 90 degrees, right 0 degrees and left 180 degrees)
+			angle = 90 - angle;
+			Quaternion lookAtRotation = Quaternion.AngleAxis(angle, -trOrientationObject.transform.forward);
+			trOrientationObject.transform.rotation = lookAtRotation;
 		}
 
 		// The player confirmed the orientation, so we have to actually move the ship
 		if(nCurrentMenuLevel == 3) {
 
-			if(trOrientationObject.gameObject.activeInHierarchy == true) {
-
-				qMovementTargetRotation = trOrientationObject.transform.rotation;
-				vMoveDirection = trOrientationObject.transform.position - transform.position;
-				trOrientationObject.gameObject.SetActive(false);
-			}
-
-			// 
 			fAngle = Quaternion.Angle(transform.rotation, qMovementTargetRotation);
 			fTimeToComplete = fAngle / fRotationSpeed;
 			fDonePercentage = Mathf.Min(1f, Time.deltaTime / fTimeToComplete);
@@ -166,10 +218,12 @@ public class InputCruiserMovement : MonoBehaviour {
 					|| (Mathf.Abs(transform.position.y - vMovementTargetPosition.y) > 0.01f)) {
 
 				transform.position += vMoveDirection.normalized * Time.deltaTime * fMoveSpeed;
+				lineToTargetPosition.SetPosition(0, transform.position + new Vector3(0,0,-2));
 			}
 			else {
 
 				// Arrived on target position
+				EnterMenuLevel(0);
 			}
 		}
 	}
