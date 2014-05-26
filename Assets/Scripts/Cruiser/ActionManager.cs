@@ -15,11 +15,19 @@ public class ActionManager : MonoBehaviour {
 	};
 
 	public Action act = Action.CANNON_SHOT;
-	public Transform shootPoint;
+	public Transform shootPointLeft;
+	public Transform shootPointRight;
 	public GameObject shootType;
 	public Direction shootDirection;
+
+	private Transform shootPoint;
 	// Use this for initialization
 	void Start () {
+
+		if(shootDirection == Direction.LEFT)
+			shootPoint = shootPointLeft;
+		else
+			shootPoint = shootPointRight;
 	
 	}
 	
