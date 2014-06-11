@@ -45,7 +45,8 @@ public class ActionManager : MonoBehaviour {
 
 	void CannonShot(){
 
-		Instantiate(shootType,shootPoint.transform.position,shootPoint.transform.rotation);
-
+		GameObject bullet = (GameObject)Instantiate(shootType,shootPoint.transform.position,shootPoint.transform.rotation);
+		CBasicProjectile bulletScript = bullet.GetComponent<CBasicProjectile>();
+		bulletScript.trShooter = this.transform;
 	}
 }

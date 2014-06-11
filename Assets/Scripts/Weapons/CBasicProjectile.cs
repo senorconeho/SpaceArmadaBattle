@@ -101,15 +101,15 @@ public class CBasicProjectile : MonoBehaviour {
 
 		if(!trShooter) 
 			return;
-
+		Debug.Log ("KABUUMMM");
 		// Ignore entities shooting themselves or friendlies
 		if(trShooter.gameObject.layer == trEntityHit.gameObject.layer)
 			return;
-
+		Debug.Log ("KABUUMMM2");
 		CBaseActor actorScript = trEntityHit.GetComponent<CBaseActor>();
 
 		if(actorScript != null) {
-			
+
 			actorScript.OnDamage( fDamageDone, transform.forward, null ); // FIXME: passing null instead of CBaseActor here...
 		}
 
