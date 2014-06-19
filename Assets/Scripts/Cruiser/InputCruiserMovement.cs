@@ -26,7 +26,8 @@ public class InputCruiserMovement : MonoBehaviour {
 	public Vector3				vMovementTargetPosition;		//< Selected position to move the ship to
 	Quaternion		qMovementTargetRotation;		//< Selected orientation of the ship
 
-	LineRenderer	lineToTargetPosition = null;	//< To draw a line
+	//LineRenderer	lineToTargetPosition = null;	//< To draw a line
+	AnimatedLine			lineScript;
 
 	public int nMenuLevel = 0;
 	InputGenericMouseCursorPosition	mouseScript;
@@ -50,9 +51,7 @@ public class InputCruiserMovement : MonoBehaviour {
 	void Start () {
 	
 		mouseScript = GetComponent<InputGenericMouseCursorPosition>();
-		lineToTargetPosition = GetComponent<LineRenderer>();
-		lineToTargetPosition.SetWidth(0.2f,0.1f);
-		lineToTargetPosition.SetColors(Color.red, Color.red);
+		lineScript = GetComponent<AnimatedLine>();
 
 		if(prefabOrientationObject != null) {
 
@@ -138,8 +137,9 @@ public class InputCruiserMovement : MonoBehaviour {
 			trOrientationObject.transform.position = vMovementTargetPosition;
 
 			// Draws the LineRenderer
-			lineToTargetPosition.SetPosition(0, transform.position + new Vector3(0,0,-2));
-			lineToTargetPosition.SetPosition(1, trOrientationObject.position);
+			lineScript.SetLinePosition(transform.position + new Vector3(0,0,-2), trOrientationObject.position);
+			//lineToTargetPosition.SetPosition(0, transform.position + new Vector3(0,0,-2));
+			//lineToTargetPosition.SetPosition(1, trOrientationObject.position);
 		}
 
 		if(nCurrentMenuLevel == 3) {
@@ -160,8 +160,7 @@ public class InputCruiserMovement : MonoBehaviour {
 		if(nCurrentMenuLevel == 1) {	// Selecting target position
 
 			// Hides the line renderer
-			lineToTargetPosition.SetPosition(0, transform.position);
-			lineToTargetPosition.SetPosition(1, transform.position);
+			lineScript.SetLinePosition(transform.position, transform.position);
 			txCurrentCursor = null;
 		}
 		
@@ -186,8 +185,9 @@ public class InputCruiserMovement : MonoBehaviour {
 		if(nCurrentMenuLevel == 1) {
 			
 			// Draws the LineRenderer
-			lineToTargetPosition.SetPosition(0, this.transform.position + new Vector3(0,0,-2));
-			lineToTargetPosition.SetPosition(1, mouseScript.GetCurrentCursorPosition() + new Vector3(0,0,-2));
+			//lineToTargetPosition.SetPosition(0, this.transform.position + new Vector3(0,0,-2));
+			//lineToTargetPosition.SetPosition(1, mouseScript.GetCurrentCursorPosition() + new Vector3(0,0,-2));
+			lineScript.SetLinePosition(this.transform.position + new Vector3(0,0,-2), mouseScript.GetCurrentCursorPosition() + new Vector3(0,0,-2));
 
 		}
 		// The player confirmed the target position. Now he must select the ship orientation
@@ -218,7 +218,8 @@ public class InputCruiserMovement : MonoBehaviour {
 					|| (Mathf.Abs(transform.position.y - vMovementTargetPosition.y) > 0.01f)) {
 
 				transform.position += vMoveDirection.normalized * Time.deltaTime * fMoveSpeed;
-				lineToTargetPosition.SetPosition(0, transform.position + new Vector3(0,0,-2));
+				//lineToTargetPosition.SetPosition(0, transform.position + new Vector3(0,0,-2));
+				lineScript.SetPosition(0, transform.position + new Vector3(0,0,-2));
 			}
 			else {
 
