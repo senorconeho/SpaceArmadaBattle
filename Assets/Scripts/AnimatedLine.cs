@@ -41,11 +41,11 @@ public class AnimatedLine : MonoBehaviour {
 	void Update () {
 	
 		// animate
-		if(lrMaterial.mainTextureScale.x >= 1.0f) {
+		float offset = lrMaterial.mainTextureOffset.x + Time.deltaTime * -fScrollSpeed;
+		if(Mathf.Abs(offset) > 1.0f)
+			offset = 0.0f;
 
-			float offset = Time.time * -fScrollSpeed;
-			lrMaterial.mainTextureOffset = new Vector2(offset, 0);
-		}
+		lrMaterial.mainTextureOffset = new Vector2(offset, 0);
 	}
 
 	/* -----------------------------------------------------------------------------------------------------------
@@ -79,6 +79,9 @@ public class AnimatedLine : MonoBehaviour {
 
 		// Update the tiling in the material
 		float fRepeats = fMagnitude / nRepeatsPerMetre;
+		if(fRepeats < 1.0f)
+			fRepeats = 1.0f;
+
 		lrMaterial.mainTextureScale = new Vector2(fRepeats, 1);
 	}
 
